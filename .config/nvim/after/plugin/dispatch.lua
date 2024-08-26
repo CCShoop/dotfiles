@@ -1,1 +1,1 @@
-vim.keymap.set("n", "<F7>", ":Make! -j10 -C ~/erctd/build/linux-gcc-x64-debug<cr>")
+-- vim.keymap.set("n", "<leader>b", ":Make! -j10 -C ~/erctd/build/linux-gcc-x64-debug<cr>")
