@@ -7,8 +7,8 @@ require("toggleterm").setup {
     shade_terminals = true,
 	float_opts = {
 		border = "curved",
-		width = math.ceil(vim.o.columns*0.8),
-		height = math.ceil(vim.o.lines*0.9)
+		width = math.ceil(vim.o.columns*0.7),
+		height = math.ceil(vim.o.lines*0.8)
 	},
     winbar = {
     enabled = false,
@@ -36,16 +36,59 @@ vim.api.nvim_set_keymap("n", "<leader>g", "<cmd>lua _lazygit_toggle()<CR>", {nor
 local build = Terminal:new(
     {
         name = "erctd build",
-        cmd = "make -j10 -C /home/cshoop/erctd/build/linux-gcc-x64-debug || read -p 'Build error!'",
         dir = "/home/cshoop/erctd",
+        cmd = "make -j10 -C /home/cshoop/erctd/build/linux-gcc-x64-debug || read -p 'Build error! Press enter to close.'",
         direction = "float",
         count = 69,
-        on_open = function(term)
-            vim.api.nvim_buf_set_keymap(term.bufnr, "n", "q", "<cmd>close<CR>", {noremap = true, silent = true})
-        end
+        float_opts =
+        {
+            border = "double",
+            width = math.ceil(vim.o.columns*0.6),
+            height = math.ceil(vim.o.lines*0.8)
+        }
     }
 )
 function _build()
     build:toggle()
 end
 vim.api.nvim_set_keymap("n", "<leader>b", "<cmd>lua _build()<CR>", {noremap = true, silent = true})
+
+local runhal = Terminal:new(
+    {
+        name = "run hal",
+        dir = "/home/cshoop/erctd/build/linux-gcc-x64-debug/hal/server",
+        cmd = "./hal",
+        direction = "float",
+        count = 7,
+        float_opts =
+        {
+            border = "single",
+            width = math.ceil(vim.o.columns*0.5),
+            height = math.ceil(vim.o.lines*0.6)
+        }
+    }
+)
+function _runhal()
+    runhal:toggle()
+end
+vim.api.nvim_set_keymap("n", "<leader>rh", "<cmd>lua _runhal()<CR>", {noremap = true, silent = true})
+
+local runpal = Terminal:new(
+    {
+        name = "run pal",
+        dir = "/home/cshoop/erctd/build/linux-gcc-x64-debug/hal/pal",
+        cmd = "./pal",
+        direction = "float",
+        count = 8,
+        float_opts =
+        {
+            border = "single",
+            width = math.ceil(vim.o.columns*0.5),
+            height = math.ceil(vim.o.lines*0.6)
+        }
+    }
+)
+function _runpal()
+    runpal:toggle()
+end
+vim.api.nvim_set_keymap("n", "<leader>rp", "<cmd>lua _runpal()<CR>", {noremap = true, silent = true})
