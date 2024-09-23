@@ -130,6 +130,11 @@ _G.packer_plugins = {
     path = "/home/cshoop/.local/share/nvim/site/pack/packer/start/neodev.nvim",
     url = "https://github.com/folke/neodev.nvim"
   },
+  nvim = {
+    loaded = true,
+    path = "/home/cshoop/.local/share/nvim/site/pack/packer/start/nvim",
+    url = "https://github.com/catppuccin/nvim"
+  },
   ["nvim-cmp"] = {
     loaded = true,
     path = "/home/cshoop/.local/share/nvim/site/pack/packer/start/nvim-cmp",
@@ -216,8 +221,13 @@ _G.packer_plugins = {
     path = "/home/cshoop/.local/share/nvim/site/pack/packer/start/toggleterm.nvim",
     url = "https://github.com/akinsho/toggleterm.nvim"
   },
+  ["tokyonight.nvim"] = {
+    loaded = true,
+    path = "/home/cshoop/.local/share/nvim/site/pack/packer/start/tokyonight.nvim",
+    url = "https://github.com/folke/tokyonight.nvim"
+  },
   ["ultimate-autopair.nvim"] = {
-    config = { "\27LJ\2\nÓ\1\0\0\5\0\n\0\0176\0\0\0'\2\1\0B\0\2\0029\0\2\0005\2\5\0005\3\3\0004\4\0\0>\4\1\0035\4\4\0>\4\2\3=\3\6\0025\3\a\0005\4\b\0=\4\t\3>\3\1\2B\0\2\1K\0\1\0\aft\1\4\0\0\bcpp\bhpp\6h\1\3\2\0\6<\6>\aft\0\14multiline\1\rfastwarp\1\0\1\rfastwarp\0\1\0\3\vfaster\2\tcmap\n<A-e>\bmap\n<A-e>\1\0\1\nmulti\2\nsetup\22ultimate-autopair\frequire\0" },
+    config = { "\27LJ\2\nÓ\1\0\0\5\0\n\0\0176\0\0\0'\2\1\0B\0\2\0029\0\2\0005\2\5\0005\3\3\0004\4\0\0>\4\1\0035\4\4\0>\4\2\3=\3\6\0025\3\a\0005\4\b\0=\4\t\3>\3\1\2B\0\2\1K\0\1\0\aft\1\4\0\0\bcpp\bhpp\6h\1\3\2\0\6<\6>\14multiline\1\aft\0\rfastwarp\1\0\1\rfastwarp\0\1\0\3\bmap\n<A-e>\tcmap\n<A-e>\vfaster\2\1\0\1\nmulti\2\nsetup\22ultimate-autopair\frequire\0" },
     loaded = false,
     needs_bufread = false,
     only_cond = false,
@@ -264,8 +274,8 @@ vim.cmd [[augroup packer_load_aucmds]]
 vim.cmd [[au!]]
   -- Event lazy-loads
 time([[Defining lazy-load event autocommands]], true)
-vim.cmd [[au CmdlineEnter * ++once lua require("packer.load")({'ultimate-autopair.nvim'}, { event = "CmdlineEnter *" }, _G.packer_plugins)]]
 vim.cmd [[au InsertEnter * ++once lua require("packer.load")({'ultimate-autopair.nvim'}, { event = "InsertEnter *" }, _G.packer_plugins)]]
+vim.cmd [[au CmdlineEnter * ++once lua require("packer.load")({'ultimate-autopair.nvim'}, { event = "CmdlineEnter *" }, _G.packer_plugins)]]
 time([[Defining lazy-load event autocommands]], false)
 vim.cmd("augroup END")
 
