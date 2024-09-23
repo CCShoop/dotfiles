@@ -35,9 +35,9 @@ vim.api.nvim_set_keymap("n", "<leader>g", "<cmd>lua _lazygit_toggle()<CR>", {nor
 
 local build = Terminal:new(
     {
-        name = "erctd build",
+        name = "erctd linux build",
         dir = "/home/cshoop/erctd",
-        cmd = "make -j10 -C /home/cshoop/erctd/build/linux-gcc-x64-debug || read -p 'Build error! Press enter to close.'",
+        cmd = "make -j16 -C /home/cshoop/erctd/build/linux-gcc-x64-debug && read -p '\nBuild successful! Press ENTER to close.' || read -p '\nERROR: Build failed! Press ENTER to close.'",
         direction = "float",
         count = 69,
         float_opts =
@@ -52,6 +52,26 @@ function _build()
     build:toggle()
 end
 vim.api.nvim_set_keymap("n", "<leader>b", "<cmd>lua _build()<CR>", {noremap = true, silent = true})
+
+local winbuild = Terminal:new(
+    {
+        name = "erctd windows build",
+        dir = "/home/cshoop/tools",
+        cmd = "./build_erctd_win10.sh && read -p '\nBuild successful! Press ENTER to close.' || read -p '\nERROR: Build failed! Press ENTER to close.'",
+        direction = "float",
+        count = 6,
+        float_opts =
+        {
+            border = "double",
+            width = math.ceil(vim.o.columns*0.6),
+            height = math.ceil(vim.o.lines*0.8)
+        }
+    }
+)
+function _winbuild()
+    winbuild:toggle()
+end
+vim.api.nvim_set_keymap("n", "<leader>wb", "<cmd>lua _winbuild()<CR>", {noremap = true, silent = true})
 
 local runhal = Terminal:new(
     {
@@ -92,3 +112,23 @@ function _runpal()
     runpal:toggle()
 end
 vim.api.nvim_set_keymap("n", "<leader>rp", "<cmd>lua _runpal()<CR>", {noremap = true, silent = true})
+
+local runimi = Terminal:new(
+    {
+        name = "run imi creator",
+        dir = "/home/cshoop/avt_tools/imi_creator",
+        cmd = "python3 imi_creator.py || read -p 'Holding...'",
+        direction = "float",
+        count = 9,
+        float_opts =
+        {
+            border = "single",
+            width = math.ceil(vim.o.columns*0.5),
+            height = math.ceil(vim.o.lines*0.6)
+        }
+    }
+)
+function _runimi()
+    runimi:toggle()
+end
+vim.api.nvim_set_keymap("n", "<leader>ri", "<cmd>lua _runimi()<CR>", {noremap = true, silent = true})
