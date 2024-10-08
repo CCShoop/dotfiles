@@ -35,9 +35,10 @@ local ensure_packer = function()
 
     use('christoomey/vim-tmux-navigator')
     -- colorscheme
-    use('ellisonleao/gruvbox.nvim')
-    use('catppuccin/nvim')
     use('folke/tokyonight.nvim')
+    require('tokyonight').setup({
+        transparent = true
+    })
 
     -- session persistence
     use({
