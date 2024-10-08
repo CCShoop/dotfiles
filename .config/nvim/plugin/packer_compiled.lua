@@ -94,11 +94,6 @@ _G.packer_plugins = {
     path = "/home/cshoop/.local/share/nvim/site/pack/packer/start/gitsigns.nvim",
     url = "https://github.com/lewis6991/gitsigns.nvim"
   },
-  ["gruvbox.nvim"] = {
-    loaded = true,
-    path = "/home/cshoop/.local/share/nvim/site/pack/packer/start/gruvbox.nvim",
-    url = "https://github.com/ellisonleao/gruvbox.nvim"
-  },
   ["lazygit.nvim"] = {
     config = { "\27LJ\2\nL\0\0\3\0\4\0\a6\0\0\0'\2\1\0B\0\2\0029\0\2\0'\2\3\0B\0\2\1K\0\1\0\flazygit\19load_extension\14telescope\frequire\0" },
     loaded = true,
@@ -129,11 +124,6 @@ _G.packer_plugins = {
     loaded = true,
     path = "/home/cshoop/.local/share/nvim/site/pack/packer/start/neodev.nvim",
     url = "https://github.com/folke/neodev.nvim"
-  },
-  nvim = {
-    loaded = true,
-    path = "/home/cshoop/.local/share/nvim/site/pack/packer/start/nvim",
-    url = "https://github.com/catppuccin/nvim"
   },
   ["nvim-cmp"] = {
     loaded = true,
@@ -186,7 +176,7 @@ _G.packer_plugins = {
     url = "https://github.com/wbthomason/packer.nvim"
   },
   ["persisted.nvim"] = {
-    config = { "\27LJ\2\n8\0\0\3\0\3\0\0056\0\0\0009\0\1\0'\2\2\0B\0\2\1K\0\1\0\22No session found.\vnotify\bvim申1\1\0\4\0\6\0\t6\0\0\0'\2\1\0B\0\2\0029\0\2\0005\2\3\0003\3\4\0=\3\5\2B\0\2\1K\0\1\0\27on_autoload_no_session\0\1\0\3\27on_autoload_no_session\0\rautoload\2\19use_git_branch\2\nsetup\14persisted\frequire\0" },
+    config = { "\27LJ\2\n8\0\0\3\0\3\0\0056\0\0\0009\0\1\0'\2\2\0B\0\2\1K\0\1\0\22No session found.\vnotify\bvim申1\1\0\4\0\6\0\t6\0\0\0'\2\1\0B\0\2\0029\0\2\0005\2\3\0003\3\4\0=\3\5\2B\0\2\1K\0\1\0\27on_autoload_no_session\0\1\0\3\rautoload\2\19use_git_branch\2\27on_autoload_no_session\0\nsetup\14persisted\frequire\0" },
     loaded = true,
     path = "/home/cshoop/.local/share/nvim/site/pack/packer/start/persisted.nvim",
     url = "https://github.com/olimorris/persisted.nvim"
@@ -227,7 +217,7 @@ _G.packer_plugins = {
     url = "https://github.com/folke/tokyonight.nvim"
   },
   ["ultimate-autopair.nvim"] = {
-    config = { "\27LJ\2\nﾓ\1\0\0\5\0\n\0\0176\0\0\0'\2\1\0B\0\2\0029\0\2\0005\2\5\0005\3\3\0004\4\0\0>\4\1\0035\4\4\0>\4\2\3=\3\6\0025\3\a\0005\4\b\0=\4\t\3>\3\1\2B\0\2\1K\0\1\0\aft\1\4\0\0\bcpp\bhpp\6h\1\3\2\0\6<\6>\14multiline\1\aft\0\rfastwarp\1\0\1\rfastwarp\0\1\0\3\bmap\n<A-e>\tcmap\n<A-e>\vfaster\2\1\0\1\nmulti\2\nsetup\22ultimate-autopair\frequire\0" },
+    config = { "\27LJ\2\nﾓ\1\0\0\5\0\n\0\0176\0\0\0'\2\1\0B\0\2\0029\0\2\0005\2\5\0005\3\3\0004\4\0\0>\4\1\0035\4\4\0>\4\2\3=\3\6\0025\3\a\0005\4\b\0=\4\t\3>\3\1\2B\0\2\1K\0\1\0\aft\1\4\0\0\bcpp\bhpp\6h\1\3\2\0\6<\6>\aft\0\14multiline\1\rfastwarp\1\0\1\rfastwarp\0\1\0\3\tcmap\n<A-e>\vfaster\2\bmap\n<A-e>\1\0\1\nmulti\2\nsetup\22ultimate-autopair\frequire\0" },
     loaded = false,
     needs_bufread = false,
     only_cond = false,
@@ -262,14 +252,14 @@ _G.packer_plugins = {
 }
 
 time([[Defining packer_plugins]], false)
--- Config for: persisted.nvim
-time([[Config for persisted.nvim]], true)
-try_loadstring("\27LJ\2\n8\0\0\3\0\3\0\0056\0\0\0009\0\1\0'\2\2\0B\0\2\1K\0\1\0\22No session found.\vnotify\bvim申1\1\0\4\0\6\0\t6\0\0\0'\2\1\0B\0\2\0029\0\2\0005\2\3\0003\3\4\0=\3\5\2B\0\2\1K\0\1\0\27on_autoload_no_session\0\1\0\3\27on_autoload_no_session\0\rautoload\2\19use_git_branch\2\nsetup\14persisted\frequire\0", "config", "persisted.nvim")
-time([[Config for persisted.nvim]], false)
 -- Config for: lazygit.nvim
 time([[Config for lazygit.nvim]], true)
 try_loadstring("\27LJ\2\nL\0\0\3\0\4\0\a6\0\0\0'\2\1\0B\0\2\0029\0\2\0'\2\3\0B\0\2\1K\0\1\0\flazygit\19load_extension\14telescope\frequire\0", "config", "lazygit.nvim")
 time([[Config for lazygit.nvim]], false)
+-- Config for: persisted.nvim
+time([[Config for persisted.nvim]], true)
+try_loadstring("\27LJ\2\n8\0\0\3\0\3\0\0056\0\0\0009\0\1\0'\2\2\0B\0\2\1K\0\1\0\22No session found.\vnotify\bvim申1\1\0\4\0\6\0\t6\0\0\0'\2\1\0B\0\2\0029\0\2\0005\2\3\0003\3\4\0=\3\5\2B\0\2\1K\0\1\0\27on_autoload_no_session\0\1\0\3\rautoload\2\19use_git_branch\2\27on_autoload_no_session\0\nsetup\14persisted\frequire\0", "config", "persisted.nvim")
+time([[Config for persisted.nvim]], false)
 vim.cmd [[augroup packer_load_aucmds]]
 vim.cmd [[au!]]
   -- Event lazy-loads
