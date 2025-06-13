@@ -8,7 +8,7 @@ vim.keymap.set('n', '<C-p>', builtin.find_files, {})
 -- vim.keymap.set('n', '<a-m>', builtin.find_files, {}) -- REMAP CTRL-P to CTRL-\ on WINDOWS IN POWERTOYS
 vim.keymap.set('n', '<a-c>', builtin.commands, {}) -- REMAP CTRL-P to CTRL-\ on WINDOWS IN POWERTOYS
 vim.keymap.set('n', '<leader>pf', builtin.git_files, {})
-vim.keymap.set('n', '<a-g>', builtin.live_grep, {})
+vim.keymap.set('n', '<c-g>', builtin.live_grep, {})
 vim.keymap.set('n', '<a-q>', builtin.quickfix, {})
 
 vim.keymap.set('n', '<a-f>', function()
