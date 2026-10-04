@@ -5,7 +5,6 @@
 set -euo pipefail
 
 NVIM_VERSION="v0.12.5"
-LAZYGIT_VERSION="0.65.1"
 NVIM_PREFIX="/usr/local"
 
 repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -22,10 +21,12 @@ for item in "$repo_dir"/*; do
     cp -a "$item" "$target_dir/"
 done
 
-# Lazygit
+# Lazygit (newest release)
+lazygit_latest_url="$(curl -fsSLI -o /dev/null -w '%{url_effective}' https://github.com/jesseduffield/lazygit/releases/latest)"
+LAZYGIT_VERSION="${lazygit_latest_url##*/v}"
 lazygit_bin="$target_dir/.config/lazygit/lazygit"
 if [[ -x "$lazygit_bin" ]] && "$lazygit_bin" --version | grep -q "version=$LAZYGIT_VERSION,"; then
-    echo "Lazygit $LAZYGIT_VERSION already downloaded, skipping"
+    echo "Lazygit $LAZYGIT_VERSION already installed, skipping"
 else
     case "$(uname -m)" in
         x86_64) lazygit_arch="x86_64" ;;
