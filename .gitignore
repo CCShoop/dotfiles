@@ -1,1 +1,5 @@
-*
+# Secrets
+.config/gh/hosts.yml
+
+# Downloaded by setup.sh
+.config/lazygit/lazygit

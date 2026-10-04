@@ -44,7 +44,13 @@ vim.keymap.set("n", "<leader>sr", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left>
 vim.keymap.set("n", "<leader>sl", ":SessionSave<cr>:SessionSelect<cr>")
 
 -- other
-vim.keymap.set("n", "<leader><leader>", ":w<cr>:qa<cr>")
+vim.keymap.set("n", "<leader><leader>", function()
+  if vim.api.nvim_buf_get_name(0) == "" then
+    vim.cmd("q")
+  else
+    vim.cmd("w | qa")
+  end
+end)
 vim.keymap.set("n", "<C-s>", ":w<cr>")
 vim.keymap.set("n", "<leader>n", ":noh<cr>")
 
