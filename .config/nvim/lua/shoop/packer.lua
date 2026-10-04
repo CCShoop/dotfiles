@@ -28,7 +28,7 @@ local ensure_packer = function()
     -- telescope fuzzy finder
     use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release' }
     use {
-		'nvim-telescope/telescope.nvim', tag = '0.1.4',
+		'nvim-telescope/telescope.nvim', branch = 'master',
 		-- or                          , branch = '0.1.x',
 		requires = { {'nvim-lua/plenary.nvim'} }
     }
@@ -104,34 +104,22 @@ local ensure_packer = function()
     
 
     -- invisible code nodes
-    use('nvim-treesitter/nvim-treesitter', {run = ':TSUpdate'})
-    use {
-        requires = { "nvim-treesitter/nvim-treesitter" },
-        "Badhi/nvim-treesitter-cpp-tools",
-    }
-    use('nvim-treesitter/nvim-treesitter-textobjects')
-    use('nvim-treesitter/playground')
+    use{'nvim-treesitter/nvim-treesitter', branch = 'main', run = ':TSUpdate'}
+    use{'nvim-treesitter/nvim-treesitter-textobjects', branch = 'main'}
     -- language servers
+    use('neovim/nvim-lspconfig')
     use {
-        'VonHeikemen/lsp-zero.nvim',
-        branch = 'v2.x',
-        requires = {
-            -- LSP Support
-            {'neovim/nvim-lspconfig'},             -- Required
-            {                                      -- Optional
-            'williamboman/mason.nvim',
-            run = function()
-                pcall(vim.cmd, 'MasonUpdate')
-            end,
-            },
-            {'williamboman/mason-lspconfig.nvim'}, -- Optional
-  
-            -- Autocompletion
-            {'hrsh7th/nvim-cmp'},     -- Required
-            {'hrsh7th/cmp-nvim-lsp'}, -- Required
-            {'L3MON4D3/LuaSnip'},     -- Required
-        }
+        'williamboman/mason.nvim',
+        run = function()
+            pcall(vim.cmd, 'MasonUpdate')
+        end,
     }
+    use('williamboman/mason-lspconfig.nvim')
+
+    -- autocompletion
+    use('hrsh7th/nvim-cmp')
+    use('hrsh7th/cmp-nvim-lsp')
+    use('L3MON4D3/LuaSnip')
 
     -- git
     use({
@@ -147,7 +135,45 @@ local ensure_packer = function()
     })
 
     -- git changes in buffer, inline git blame
-    use('lewis6991/gitsigns.nvim')
+    --use('lewis6991/gitsigns.nvim')
+
+    -- Claude Code
+    use {
+        'dukjjang/claude-code.nvim',
+        requires = {
+            'nvim-lua/plenary.nvim',
+        },
+        config = function()
+            require('claude-code').setup({
+                -- Floating window configuration (only applies when position = "float")
+                window = {
+                    position = "float",
+                    float = {
+                        width = "80%",
+                        height = "80%",
+                        row = "center",
+                        col = "center",
+                        relative = "editor",
+                        border = "rounded",
+                    },
+                },
+                -- File refresh settings
+                refresh = {
+                    enable = true,           -- Enable file change detection
+                    updatetime = 100,        -- updatetime when Claude Code is active (milliseconds)
+                    timer_interval = 1000,   -- How often to check for file changes (milliseconds)
+                    show_notifications = true, -- Show notification when files are reloaded
+                },
+                -- Keymaps
+                keymaps = {
+                    toggle = {
+                        normal = "<leader>ai",  -- Normal mode keymap for toggling Claude Code
+                        terminal = "<C-o>",     -- Terminal mode keymap for toggling Claude Code
+                    }
+                }
+            })
+        end
+    }
 
     -- Automatically set up your configuration after cloning packer.nvim
     -- Put this at the end after all plugins

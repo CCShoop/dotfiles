@@ -1,136 +1,126 @@
-require'nvim-treesitter.configs'.setup {
-    -- A list of parser names, or "all" (the five listed parsers should always be installed)
-    ensure_installed = { "java", "c", "cpp", "lua", "vim", "vimdoc", "query" },
-  
-    -- Install parsers synchronously (only applied to `ensure_installed`)
-    sync_install = false,
-  
-    -- Automatically install missing parsers when entering buffer
-    -- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
-    auto_install = true,
-  
-    -- List of parsers to ignore installing (for "all")
-    ignore_install = { "javascript" },
-  
-    prefer_git = true,
-  
-    highlight = {
-      enable = true,
-  
-      -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
-      -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
-      -- Using this option may slow down your editor, and you may see some duplicate highlights.
-      -- Instead of true it can also be a list of languages
-      additional_vim_regex_highlighting = false,
-    },
-    textobjects = {
-        select = {
-            enable = true,
-  
-            -- Automatically jump forward to textobj, similar to targets.vim
-            lookahead = true,
-  
-            keymaps = {
-                -- You can use the capture groups defined in textobjects.scm
-                ["af"] = "@function.outer",
-                ["if"] = "@function.inner",
-                ["ac"] = "@class.outer",
-                -- You can optionally set descriptions to the mappings (used in the desc parameter of
-                -- nvim_buf_set_keymap) which plugins like which-key display
-                ["ic"] = { query = "@class.inner", desc = "Select inner part of a class region" },
-                -- You can also use captures from other query groups like `locals.scm`
-                ["as"] = { query = "@scope", query_group = "locals", desc = "Select language scope" },
-            },
-            -- You can choose the select mode (default is charwise 'v')
-            --
-            -- Can also be a function which gets passed a table with the keys
-            -- * query_string: eg '@function.inner'
-            -- * method: eg 'v' or 'o'
-            -- and should return the mode ('v', 'V', or '<c-v>') or a table
-            -- mapping query_strings to modes.
-            selection_modes = {
-                ['@parameter.outer'] = 'v', -- charwise
-                ['@function.outer'] = 'V', -- linewise
-                ['@class.outer'] = '<c-v>', -- blockwise
-            },
-            -- If you set this to `true` (default is `false`) then any textobject is
-            -- extended to include preceding or succeeding whitespace. Succeeding
-            -- whitespace has priority in order to act similarly to eg the built-in
-            -- `ap`.
-            --
-            -- Can also be a function which gets passed a table with the keys
-            -- * query_string: eg '@function.inner'
-            -- * selection_mode: eg 'v'
-            -- and should return true of false
-            include_surrounding_whitespace = true,
+-- nvim-treesitter (main branch): installs parsers/queries only.
+-- Highlighting is Neovim's built-in vim.treesitter.start().
+-- Requires the tree-sitter CLI (>= 0.26.1) and a C compiler to build parsers.
+local ts = require('nvim-treesitter')
+
+local ensure_installed = {
+    "java", "c", "cpp", "lua", "vim", "vimdoc", "query",
+    "python", "bash", "json", "markdown", "markdown_inline", "gitcommit", "gitignore",
+}
+local ignore_install = { "javascript" }
+
+ts.install(ensure_installed)
+
+-- Start highlighting on FileType, auto-installing missing parsers (replaces
+-- the old `highlight.enable` + `auto_install = true`).
+local available = nil
+vim.api.nvim_create_autocmd('FileType', {
+    group = vim.api.nvim_create_augroup('shoop-treesitter', { clear = true }),
+    callback = function(args)
+        local lang = vim.treesitter.language.get_lang(args.match)
+        if not lang or vim.tbl_contains(ignore_install, lang) then
+            return
+        end
+
+        if pcall(vim.treesitter.start, args.buf, lang) then
+            return
+        end
+
+        available = available or ts.get_available()
+        if not vim.tbl_contains(available, lang) then
+            return
+        end
+        ts.install(lang):await(vim.schedule_wrap(function()
+            if vim.api.nvim_buf_is_loaded(args.buf) then
+                pcall(vim.treesitter.start, args.buf, lang)
+            end
+        end))
+    end,
+})
+
+
+-- textobjects (main branch): options via setup, keymaps defined manually
+require('nvim-treesitter-textobjects').setup {
+    select = {
+        -- Automatically jump forward to textobj, similar to targets.vim
+        lookahead = true,
+        -- You can choose the select mode (default is charwise 'v')
+        selection_modes = {
+            ['@parameter.outer'] = 'v', -- charwise
+            ['@function.outer'] = 'V', -- linewise
+            ['@class.outer'] = '<c-v>', -- blockwise
         },
-        move = {
-            enable = true,
-            set_jumps = true, -- whether to set jumps in the jumplist
-            goto_next_start = {
-                ["]m"] = "@function.outer",
-                ["]]"] = { query = "@class.outer", desc = "Next class start" },
-                --
-                -- You can use regex matching (i.e. lua pattern) and/or pass a list in a "query" key to group multiple queires.
-                ["]o"] = "@loop.*",
-                -- ["]o"] = { query = { "@loop.inner", "@loop.outer" } }
-                --
-                -- You can pass a query group to use query from `queries/<lang>/<query_group>.scm file in your runtime path.
-                -- Below example nvim-treesitter's `locals.scm` and `folds.scm`. They also provide highlights.scm and indent.scm.
-                ["]s"] = { query = "@scope", query_group = "locals", desc = "Next scope" },
-                ["]z"] = { query = "@fold", query_group = "folds", desc = "Next fold" },
-            },
-            goto_next_end = {
-                ["]M"] = "@function.outer",
-                ["]["] = "@class.outer",
-            },
-            goto_previous_start = {
-                ["[m"] = "@function.outer",
-                ["[["] = "@class.outer",
-            },
-            goto_previous_end = {
-                ["[M"] = "@function.outer",
-                ["[]"] = "@class.outer",
-            },
-            -- Below will go to either the start or the end, whichever is closer.
-            -- Use if you want more granular movements
-            -- Make it even more gradual by adding multiple queries and regex.
-            goto_next = {
-                ["]d"] = "@conditional.outer",
-            },
-            goto_previous = {
-                ["[d"] = "@conditional.outer",
-            }
-        },
+        -- Extend textobjects to include preceding or succeeding whitespace,
+        -- like the built-in `ap`.
+        include_surrounding_whitespace = true,
     },
-  }
-  
-  
-  local ts_query = require'nvim-treesitter.query'
-  
-  local M = {}
-  
-  function M.get_current_function_name()
-      local current_node = ts_query.get_node_at_cursor()
-      if not current_node then
-          return ""
-      end
-  
-      local expr = current_node
-  
-      while expr do
-          if expr:type() == 'function_definition' then
-              break
-          end
-          expr = expr:parent()
-      end
-  
-      if not expr then
-          return ""
-      end
-  
-      return (ts_query.get_node_text(expr:child(1)))[1]
-  end
-  
-  vim.api.nvim_create_user_command("TestTS", function() print(M.get_current_function_name()) end, {})
-  
+    move = {
+        set_jumps = true, -- whether to set jumps in the jumplist
+    },
+}
+
+local select = require('nvim-treesitter-textobjects.select')
+local move = require('nvim-treesitter-textobjects.move')
+
+local function map_select(lhs, query, group, desc)
+    vim.keymap.set({ "x", "o" }, lhs, function()
+        select.select_textobject(query, group or "textobjects")
+    end, { desc = desc })
+end
+
+-- You can use the capture groups defined in textobjects.scm
+map_select("af", "@function.outer")
+map_select("if", "@function.inner")
+map_select("ac", "@class.outer")
+map_select("ic", "@class.inner", nil, "Select inner part of a class region")
+-- You can also use captures from other query groups like `locals.scm`
+map_select("as", "@local.scope", "locals", "Select language scope")
+
+local function map_move(lhs, fn, query, group, desc)
+    vim.keymap.set({ "n", "x", "o" }, lhs, function()
+        move[fn](query, group or "textobjects")
+    end, { desc = desc })
+end
+
+map_move("]m", "goto_next_start", "@function.outer")
+map_move("]]", "goto_next_start", "@class.outer", nil, "Next class start")
+-- Pass a list to group multiple queries
+map_move("]o", "goto_next_start", { "@loop.inner", "@loop.outer" })
+-- Queries from other groups (`locals.scm`, `folds.scm`)
+map_move("]s", "goto_next_start", "@local.scope", "locals", "Next scope")
+map_move("]z", "goto_next_start", "@fold", "folds", "Next fold")
+
+map_move("]M", "goto_next_end", "@function.outer")
+map_move("][", "goto_next_end", "@class.outer")
+
+map_move("[m", "goto_previous_start", "@function.outer")
+map_move("[[", "goto_previous_start", "@class.outer")
+
+map_move("[M", "goto_previous_end", "@function.outer")
+map_move("[]", "goto_previous_end", "@class.outer")
+
+-- Go to either the start or the end, whichever is closer.
+map_move("]d", "goto_next", "@conditional.outer")
+map_move("[d", "goto_previous", "@conditional.outer")
+
+
+local M = {}
+
+function M.get_current_function_name()
+    local expr = vim.treesitter.get_node()
+
+    while expr do
+        if expr:type() == 'function_definition' then
+            break
+        end
+        expr = expr:parent()
+    end
+
+    if not expr or not expr:child(1) then
+        return ""
+    end
+
+    return vim.treesitter.get_node_text(expr:child(1), 0)
+end
+
+vim.api.nvim_create_user_command("TestTS", function() print(M.get_current_function_name()) end, {})

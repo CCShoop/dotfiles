@@ -27,6 +27,14 @@ require("telescope").setup({
             }
         }
     },
+    pickers = {
+        find_files = {
+            hidden = true,
+            no_ignore = true,
+            no_ignore_parent = true,
+            file_ignore_patterns = { "^%.git/" },
+        },
+    },
     extensions = {
         fzf = {
             fuzzy = true,
