@@ -27,6 +27,7 @@ Re-running it is safe; lazygit and Neovim are only rebuilt when out of date.
 On Debian/Ubuntu:
 
 ```sh
+sudo apt-get update
 sudo apt-get install ninja-build gettext cmake curl build-essential unzip
 ```
 
