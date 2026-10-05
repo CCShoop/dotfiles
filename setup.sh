@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Copy the contents of this repo into its parent directory, install lazygit
-# (apt if available, else the newest release), install Claude Code, and build
+# (apt if available, else the newest release), install python3-venv and python3-pynvim (apt) and
+# a python < 3.14 for mason (via uv if needed), install Claude Code, and build
 # neovim from the submodule. Tools land in /usr/local/bin, which is already on
 # PATH, so they work in the current shell as soon as this finishes.
 # Clone the repo into a folder in $HOME (e.g. ~/dotfiles) and run it there.
@@ -8,6 +9,7 @@ set -euo pipefail
 
 NVIM_VERSION="v0.12.5"
 NVIM_PREFIX="/usr/local"
+MASON_PYTHON_VERSION="3.13"
 
 repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 target_dir="$(dirname "$repo_dir")"
@@ -91,6 +93,36 @@ if command -v apt-get >/dev/null; then
     sudo apt-get update -qq
 fi
 
+# python3-venv: Debian/Ubuntu split ensurepip out, so `python3 -m venv` fails without it
+# python3-pynvim: neovim's python3 provider (used by vimspector); without it the
+# provider channel is 0 and vimspector's autocmds error with E475
+if command -v apt-get >/dev/null; then
+    for pkg in python3-venv python3-pynvim; do
+        if dpkg -s "$pkg" >/dev/null 2>&1; then
+            echo "$pkg already installed, skipping"
+        else
+            echo "Installing $pkg"
+            sudo apt-get install -y "$pkg"
+        fi
+    done
+fi
+
+# Python < 3.14 for mason: some pypi packages don't support 3.14 yet, and mason
+# falls back to a versioned python3.X on PATH. Distros that only ship 3.14 get a
+# standalone build from uv instead.
+if command -v "python$MASON_PYTHON_VERSION" >/dev/null; then
+    echo "python$MASON_PYTHON_VERSION already installed, skipping"
+else
+    uv_bin="$target_dir/.local/bin/uv"
+    if [[ ! -x "$uv_bin" ]]; then
+        echo "Installing uv"
+        curl -fsSL https://astral.sh/uv/install.sh | env UV_INSTALL_DIR="$(dirname "$uv_bin")" UV_NO_MODIFY_PATH=1 sh
+    fi
+    echo "Installing python$MASON_PYTHON_VERSION with uv"
+    UV_PYTHON_BIN_DIR="$target_dir/.local/bin" "$uv_bin" python install "$MASON_PYTHON_VERSION"
+    link_into_path "$target_dir/.local/bin/python$MASON_PYTHON_VERSION"
+fi
+
 # Lazygit: from apt if the distro packages it, otherwise the newest release
 if command -v apt-cache >/dev/null && [[ -n "$(apt-cache policy lazygit 2>/dev/null | awk '/Candidate:/ && $2 != "(none)"')" ]]; then
     echo "Installing lazygit from apt"
@@ -115,6 +147,25 @@ else
     fi
     link_into_path "$lazygit_bin"
 fi
+
+# tree-sitter CLI: nvim-treesitter (main branch) uses it to build parsers
+ts_latest_url="$(curl -fsSLI -o /dev/null -w '%{url_effective}' https://github.com/tree-sitter/tree-sitter/releases/latest)"
+TREE_SITTER_VERSION="${ts_latest_url##*/v}"
+ts_bin="$target_dir/.local/bin/tree-sitter"
+if [[ -x "$ts_bin" ]] && [[ "$("$ts_bin" --version)" == "tree-sitter $TREE_SITTER_VERSION"* ]]; then
+    echo "tree-sitter $TREE_SITTER_VERSION already installed, skipping"
+else
+    case "$(uname -m)" in
+        x86_64) ts_arch="x64" ;;
+        aarch64 | arm64) ts_arch="arm64" ;;
+        *) echo "Unsupported architecture for tree-sitter: $(uname -m)" >&2; exit 1 ;;
+    esac
+    echo "Downloading tree-sitter $TREE_SITTER_VERSION"
+    mkdir -p "$(dirname "$ts_bin")"
+    curl -fsSL "https://github.com/tree-sitter/tree-sitter/releases/download/v$TREE_SITTER_VERSION/tree-sitter-linux-$ts_arch.gz" | gunzip > "$ts_bin"
+    chmod +x "$ts_bin"
+fi
+link_into_path "$ts_bin"
 
 # Claude Code: native installer, which keeps itself up to date afterwards.
 # It installs to ~/.local/bin/claude (a symlink it re-points on each update),

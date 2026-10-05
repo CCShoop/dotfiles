@@ -19,20 +19,26 @@ cd ~/dotfiles
    the clipboard, opens GitHub's "new SSH key" page (on WSL), and waits until
    you've added it. Then it switches this repo's `origin` from HTTPS to SSH.
 3. Runs `apt-get update` (on apt systems).
-4. Installs lazygit from apt if the distro packages it, otherwise downloads the
+4. Installs `python3-venv` (apt) and makes sure a `python3.13` is on PATH for
+   Mason, since some of its pypi packages don't support Python 3.14 yet. If the
+   distro doesn't provide one, it installs `uv` and uses it to install a
+   standalone Python 3.13 into `~/.local/bin`.
+5. Installs lazygit from apt if the distro packages it, otherwise downloads the
    newest release to `~/.config/lazygit/lazygit`.
-5. Installs Claude Code with the native installer (`~/.local/bin/claude`).
+6. Downloads the newest `tree-sitter` CLI to `~/.local/bin/tree-sitter`
+   (nvim-treesitter uses it to build parsers).
+7. Installs Claude Code with the native installer (`~/.local/bin/claude`).
    Skipped if `claude` is already installed; it auto-updates from then on.
-6. Builds and installs Neovim **v0.12.5** from the `neovim` submodule into
+8. Builds and installs Neovim **v0.12.5** from the `neovim` submodule into
    `/usr/local`, installing the build dependencies with apt first if any are
    missing. Skipped if that version is already installed.
 
-`claude` (and lazygit, when downloaded) is symlinked into `/usr/local/bin`,
+`claude`, `tree-sitter` (and lazygit and `python3.13`, when downloaded) are symlinked into `/usr/local/bin`,
 which is on PATH by default, so everything works in the same shell right after
 the script finishes, with no `.bashrc` changes. On a fresh WSL Ubuntu the only
 input it needs is your `sudo` password and adding the SSH key on GitHub.
 
-Re-running it is safe; lazygit and Neovim are only rebuilt when out of date.
+Re-running it is safe; lazygit, tree-sitter and Neovim are only rebuilt when out of date.
 
 ### Build dependencies
 
