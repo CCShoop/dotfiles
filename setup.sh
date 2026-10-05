@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copy the contents of this repo into its parent directory, install lazygit
+# Copy the contents of this repo into its parent directory, install gh and lazygit
 # (apt if available, else the newest release), install python3-venv and python3-pynvim (apt) and
 # a python < 3.14 for mason (via uv if needed), install Claude Code, and build
 # neovim from the submodule. Tools land in /usr/local/bin, which is already on
@@ -91,6 +91,37 @@ fi
 if command -v apt-get >/dev/null; then
     echo "Updating apt package lists"
     sudo apt-get update -qq
+fi
+
+# GitHub CLI: GitHub's own apt repo (distro packages lag far behind), otherwise
+# the newest release
+if command -v gh >/dev/null; then
+    echo "gh already installed, skipping"
+elif command -v apt-get >/dev/null; then
+    echo "Installing gh from GitHub's apt repo"
+    gh_keyring="/etc/apt/keyrings/githubcli-archive-keyring.gpg"
+    sudo mkdir -p -m 755 /etc/apt/keyrings
+    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee "$gh_keyring" >/dev/null
+    sudo chmod go+r "$gh_keyring"
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=$gh_keyring] https://cli.github.com/packages stable main" \
+        | sudo tee /etc/apt/sources.list.d/github-cli.list >/dev/null
+    sudo apt-get update -qq
+    sudo apt-get install -y gh
+else
+    gh_latest_url="$(curl -fsSLI -o /dev/null -w '%{url_effective}' https://github.com/cli/cli/releases/latest)"
+    GH_VERSION="${gh_latest_url##*/v}"
+    case "$(uname -m)" in
+        x86_64) gh_arch="amd64" ;;
+        aarch64 | arm64) gh_arch="arm64" ;;
+        *) echo "Unsupported architecture for gh: $(uname -m)" >&2; exit 1 ;;
+    esac
+    echo "Downloading gh $GH_VERSION"
+    gh_bin="$target_dir/.local/bin/gh"
+    mkdir -p "$(dirname "$gh_bin")"
+    curl -fsSL "https://github.com/cli/cli/releases/download/v$GH_VERSION/gh_${GH_VERSION}_linux_${gh_arch}.tar.gz" \
+        | tar -xzO "gh_${GH_VERSION}_linux_${gh_arch}/bin/gh" > "$gh_bin"
+    chmod +x "$gh_bin"
+    link_into_path "$gh_bin"
 fi
 
 # python3-venv: Debian/Ubuntu split ensurepip out, so `python3 -m venv` fails without it
