@@ -6,7 +6,7 @@ the top level gets copied into the directory the repo is cloned into.
 ## Setup
 
 ```sh
-git clone git@github.com:CCShoop/dotfiles.git ~/dotfiles
+git clone https://github.com/CCShoop/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 ./setup.sh
 ```
@@ -14,27 +14,46 @@ cd ~/dotfiles
 `setup.sh`:
 
 1. Copies `.config/` and `.tmux.conf` into `~` (overwriting existing files).
-2. Downloads the newest lazygit release to `~/.config/lazygit/lazygit` and
-   links it into `~/.local/bin`.
-3. Builds and installs Neovim **v0.12.5** from the `neovim` submodule into
-   `/usr/local` (uses `sudo` if needed). Skipped if that version is already
-   installed.
+2. Sets up GitHub SSH access if it doesn't work yet: creates
+   `~/.ssh/id_ed25519` if there isn't one, prints the public key, copies it to
+   the clipboard, opens GitHub's "new SSH key" page (on WSL), and waits until
+   you've added it. Then it switches this repo's `origin` from HTTPS to SSH.
+3. Runs `apt-get update` (on apt systems).
+4. Installs lazygit from apt if the distro packages it, otherwise downloads the
+   newest release to `~/.config/lazygit/lazygit`.
+5. Installs Claude Code with the native installer (`~/.local/bin/claude`).
+   Skipped if `claude` is already installed; it auto-updates from then on.
+6. Builds and installs Neovim **v0.12.5** from the `neovim` submodule into
+   `/usr/local`, installing the build dependencies with apt first if any are
+   missing. Skipped if that version is already installed.
+
+`claude` (and lazygit, when downloaded) is symlinked into `/usr/local/bin`,
+which is on PATH by default, so everything works in the same shell right after
+the script finishes, with no `.bashrc` changes. On a fresh WSL Ubuntu the only
+input it needs is your `sudo` password and adding the SSH key on GitHub.
 
 Re-running it is safe; lazygit and Neovim are only rebuilt when out of date.
 
 ### Build dependencies
 
-On Debian/Ubuntu:
-
-```sh
-sudo apt-get update
-sudo apt-get install ninja-build gettext cmake curl build-essential unzip
-```
+On apt systems the script installs these itself. Elsewhere, install the
+equivalents of `ninja-build gettext cmake curl build-essential unzip git`
+before running it.
 
 ### First Neovim launch
 
 Plugins are managed by packer, which clones itself on first start. Then run
 `:PackerSync` and restart.
+
+### Claude Code
+
+Run `claude` once to log in. To install it by hand instead:
+
+```sh
+curl -fsSL https://claude.ai/install.sh | bash
+```
+
+`claude doctor` checks the install and `claude update` updates it on demand.
 
 ### gh
 
