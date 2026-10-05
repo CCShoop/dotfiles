@@ -35,6 +35,7 @@ require("neodev").setup({
     ensure_installed = {
       'clangd',
       'cmake',
+      'pylsp',
     },
   })
 
