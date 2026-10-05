@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Copy the contents of this repo into its parent directory, install lazygit
+# Copy the contents of this repo into its parent directory, install gh and lazygit
 # (apt if available, else the newest release), install python3-venv and python3-pynvim (apt) and
-# a python < 3.14 for mason (via uv if needed), install Claude Code, and build
-# neovim from the submodule. Tools land in /usr/local/bin, which is already on
+# a python < 3.14 for mason (via uv if needed), and build neovim
+# from the submodule. Tools land in /usr/local/bin, which is already on
 # PATH, so they work in the current shell as soon as this finishes.
 # Clone the repo into a folder in $HOME (e.g. ~/dotfiles) and run it there.
 set -euo pipefail
@@ -93,6 +93,37 @@ if command -v apt-get >/dev/null; then
     sudo apt-get update -qq
 fi
 
+# GitHub CLI: GitHub's own apt repo (distro packages lag far behind), otherwise
+# the newest release
+if command -v gh >/dev/null; then
+    echo "gh already installed, skipping"
+elif command -v apt-get >/dev/null; then
+    echo "Installing gh from GitHub's apt repo"
+    gh_keyring="/etc/apt/keyrings/githubcli-archive-keyring.gpg"
+    sudo mkdir -p -m 755 /etc/apt/keyrings
+    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee "$gh_keyring" >/dev/null
+    sudo chmod go+r "$gh_keyring"
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=$gh_keyring] https://cli.github.com/packages stable main" \
+        | sudo tee /etc/apt/sources.list.d/github-cli.list >/dev/null
+    sudo apt-get update -qq
+    sudo apt-get install -y gh
+else
+    gh_latest_url="$(curl -fsSLI -o /dev/null -w '%{url_effective}' https://github.com/cli/cli/releases/latest)"
+    GH_VERSION="${gh_latest_url##*/v}"
+    case "$(uname -m)" in
+        x86_64) gh_arch="amd64" ;;
+        aarch64 | arm64) gh_arch="arm64" ;;
+        *) echo "Unsupported architecture for gh: $(uname -m)" >&2; exit 1 ;;
+    esac
+    echo "Downloading gh $GH_VERSION"
+    gh_bin="$target_dir/.local/bin/gh"
+    mkdir -p "$(dirname "$gh_bin")"
+    curl -fsSL "https://github.com/cli/cli/releases/download/v$GH_VERSION/gh_${GH_VERSION}_linux_${gh_arch}.tar.gz" \
+        | tar -xzO "gh_${GH_VERSION}_linux_${gh_arch}/bin/gh" > "$gh_bin"
+    chmod +x "$gh_bin"
+    link_into_path "$gh_bin"
+fi
+
 # python3-venv: Debian/Ubuntu split ensurepip out, so `python3 -m venv` fails without it
 # python3-pynvim: neovim's python3 provider (used by vimspector); without it the
 # provider channel is 0 and vimspector's autocmds error with E475
@@ -166,20 +197,6 @@ else
     chmod +x "$ts_bin"
 fi
 link_into_path "$ts_bin"
-
-# Claude Code: native installer, which keeps itself up to date afterwards.
-# It installs to ~/.local/bin/claude (a symlink it re-points on each update),
-# so linking to that path keeps /usr/local/bin/claude current.
-claude_bin="$target_dir/.local/bin/claude"
-if [[ -x "$claude_bin" ]] || command -v claude >/dev/null; then
-    echo "Claude Code already installed, skipping"
-else
-    echo "Installing Claude Code"
-    curl -fsSL https://claude.ai/install.sh | bash
-fi
-if [[ -e "$claude_bin" ]]; then
-    link_into_path "$claude_bin"
-fi
 
 # Neovim
 if command -v nvim >/dev/null && [[ "$(nvim --version | head -n1)" == "NVIM $NVIM_VERSION" ]]; then

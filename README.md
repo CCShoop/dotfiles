@@ -19,21 +19,22 @@ cd ~/dotfiles
    the clipboard, opens GitHub's "new SSH key" page (on WSL), and waits until
    you've added it. Then it switches this repo's `origin` from HTTPS to SSH.
 3. Runs `apt-get update` (on apt systems).
-4. Installs `python3-venv` (apt) and makes sure a `python3.13` is on PATH for
+4. Installs the GitHub CLI (`gh`) from GitHub's apt repo, or downloads the
+   newest release to `~/.local/bin/gh` elsewhere. Skipped if `gh` is already
+   installed.
+5. Installs `python3-venv` (apt) and makes sure a `python3.13` is on PATH for
    Mason, since some of its pypi packages don't support Python 3.14 yet. If the
    distro doesn't provide one, it installs `uv` and uses it to install a
    standalone Python 3.13 into `~/.local/bin`.
-5. Installs lazygit from apt if the distro packages it, otherwise downloads the
+6. Installs lazygit from apt if the distro packages it, otherwise downloads the
    newest release to `~/.config/lazygit/lazygit`.
-6. Downloads the newest `tree-sitter` CLI to `~/.local/bin/tree-sitter`
+7. Downloads the newest `tree-sitter` CLI to `~/.local/bin/tree-sitter`
    (nvim-treesitter uses it to build parsers).
-7. Installs Claude Code with the native installer (`~/.local/bin/claude`).
-   Skipped if `claude` is already installed; it auto-updates from then on.
 8. Builds and installs Neovim **v0.12.5** from the `neovim` submodule into
    `/usr/local`, installing the build dependencies with apt first if any are
    missing. Skipped if that version is already installed.
 
-`claude`, `tree-sitter` (and lazygit and `python3.13`, when downloaded) are symlinked into `/usr/local/bin`,
+`tree-sitter` (and gh, lazygit and `python3.13`, when downloaded) are symlinked into `/usr/local/bin`,
 which is on PATH by default, so everything works in the same shell right after
 the script finishes, with no `.bashrc` changes. On a fresh WSL Ubuntu the only
 input it needs is your `sudo` password and adding the SSH key on GitHub.
@@ -50,16 +51,6 @@ before running it.
 
 Plugins are managed by packer, which clones itself on first start. Then run
 `:PackerSync` and restart.
-
-### Claude Code
-
-Run `claude` once to log in. To install it by hand instead:
-
-```sh
-curl -fsSL https://claude.ai/install.sh | bash
-```
-
-`claude doctor` checks the install and `claude update` updates it on demand.
 
 ### gh
 
