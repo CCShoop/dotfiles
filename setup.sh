@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copy the contents of this repo into its parent directory, install gh and lazygit
+# Copy the contents of this repo into its parent directory (copy.sh), install gh and lazygit
 # (apt if available, else the newest release), install python3-venv and python3-pynvim (apt) and
 # a python < 3.14 for mason (via uv if needed), and build neovim
 # from the submodule. Tools land in /usr/local/bin, which is already on
@@ -13,17 +13,8 @@ MASON_PYTHON_VERSION="3.13"
 
 repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 target_dir="$(dirname "$repo_dir")"
-script_name="$(basename "${BASH_SOURCE[0]}")"
 
-shopt -s dotglob nullglob
-for item in "$repo_dir"/*; do
-    name="$(basename "$item")"
-    case "$name" in
-        .git | .gitignore | .gitmodules | README.md | neovim | "$script_name") continue ;;
-    esac
-    echo "Copying $name -> $target_dir/"
-    cp -a "$item" "$target_dir/"
-done
+"$repo_dir/copy.sh"
 
 # Run as root only when /usr/local isn't writable
 as_root() {

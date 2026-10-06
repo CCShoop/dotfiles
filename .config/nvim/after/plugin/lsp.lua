@@ -25,6 +25,16 @@ require("neodev").setup({
     capabilities = require('cmp_nvim_lsp').default_capabilities(),
   })
 
+  vim.lsp.config('pylsp', {
+    settings = {
+      pylsp = {
+        plugins = {
+          mccabe = { enabled = false }, -- function complexity warnings
+        },
+      },
+    },
+  })
+
   -- vim.lsp.config('clangd', {
   --     init_options = { compilationDatabasePath = "./build", },
   -- })

@@ -54,6 +54,10 @@ end)
 vim.keymap.set("n", "<C-s>", ":w<cr>")
 vim.keymap.set("n", "<leader>n", ":noh<cr>")
 
+-- terminal: Ctrl+Backspace arrives as <C-h>; send <C-w> to delete the previous word
+vim.keymap.set("t", "<C-h>", "<C-w>")
+vim.keymap.set("t", "<C-BS>", "<C-w>")
+
 -- skill issue mappings
 vim.keymap.set("i", "<,", "<<")
 vim.keymap.set("i", ":;", "::")
