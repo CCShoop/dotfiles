@@ -13,7 +13,8 @@ cd ~/dotfiles
 
 `setup.sh`:
 
-1. Copies `.config/` and `.tmux.conf` into `~` (overwriting existing files).
+1. Runs `copy.sh`, which copies `.config/` and `.tmux.conf` into `~`
+   (overwriting existing files).
 2. Sets up GitHub SSH access if it doesn't work yet: creates
    `~/.ssh/id_ed25519` if there isn't one, prints the public key, copies it to
    the clipboard, opens GitHub's "new SSH key" page (on WSL), and waits until
@@ -41,7 +42,10 @@ which is on PATH by default, so everything works in the same shell right after
 the script finishes, with no `.bashrc` changes. On a fresh WSL Ubuntu the only
 input it needs is your `sudo` password and adding the SSH key on GitHub.
 
-Re-running it is safe; lazygit, tree-sitter and Neovim are only rebuilt when out of date.
+After changing config in the repo, run `./copy.sh` to copy it into `~`
+without the rest of setup.
+
+Re-running `setup.sh` is safe; lazygit, tree-sitter and Neovim are only rebuilt when out of date.
 
 ### Build dependencies
 
@@ -80,6 +84,7 @@ gitignored, so run `gh auth login` on a new machine.
 | `.tmux.conf` | tmux config (prefix `C-a`, `M-hjkl` to move between panes) |
 | `neovim/` | Neovim source, submodule pinned to v0.12.5 |
 | `setup.sh` | Install script |
+| `copy.sh` | Copies the config into `~` (run by `setup.sh`) |
 
 ## Updating Neovim
 

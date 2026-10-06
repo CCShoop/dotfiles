@@ -169,7 +169,10 @@ local ensure_packer = function()
                     toggle = {
                         normal = "<leader>ai",  -- Normal mode keymap for toggling Claude Code
                         terminal = "<C-o>",     -- Terminal mode keymap for toggling Claude Code
-                    }
+                    },
+                    -- off: terminals send Ctrl+Enter as <C-j> and Ctrl+Backspace as <C-h>,
+                    -- which these maps turned into window jumps
+                    window_navigation = false,
                 }
             })
         end
