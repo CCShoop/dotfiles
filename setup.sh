@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Copy the contents of this repo into its parent directory (copy.sh), install gh and lazygit
-# (apt if available, else the newest release), install python3-venv and python3-pynvim (apt) and
-# a python < 3.14 for mason (via uv if needed), install Claude Code, and build
+# (apt if available, else the newest release), install python3-venv, python3-pynvim, ripgrep
+# and fzf (apt) and a python < 3.14 for mason (via uv if needed), install Claude Code, and build
 # neovim from the submodule. Tools land in /usr/local/bin, which is already on
 # PATH, so they work in the current shell as soon as this finishes.
 # Clone the repo into a folder in $HOME (e.g. ~/dotfiles) and run it there.
@@ -118,8 +118,10 @@ fi
 # python3-venv: Debian/Ubuntu split ensurepip out, so `python3 -m venv` fails without it
 # python3-pynvim: neovim's python3 provider (used by vimspector); without it the
 # provider channel is 0 and vimspector's autocmds error with E475
+# ripgrep: telescope's live_grep shells out to rg
+# fzf: the fuzzy finder CLI
 if command -v apt-get >/dev/null; then
-    for pkg in python3-venv python3-pynvim; do
+    for pkg in python3-venv python3-pynvim ripgrep fzf; do
         if dpkg -s "$pkg" >/dev/null 2>&1; then
             echo "$pkg already installed, skipping"
         else
