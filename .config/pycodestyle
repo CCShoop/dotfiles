@@ -1,4 +1,4 @@
 [pycodestyle]
 count = False
-ignore = E221,E501,W292
+ignore = E221,E501,W292,W503
 max-line-length = 160
